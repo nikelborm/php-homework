@@ -3,7 +3,7 @@ services:
   vscode-devcontainer:
     image: mcr.microsoft.com/devcontainers/typescript-node:18
     command: sleep infinity
-    restart: no
+    restart: "no"
     environment:
       - TZ=${TZ}
     volumes:

@@ -2,7 +2,7 @@ version: '3.9'
 services:
   nginx-dev:
     image: nginx:stable-alpine
-    restart: no
+    restart: "no"
     ports:
       - ${EXTERNAL_NGINX_HTTP_PORT}:80
     volumes:
@@ -20,7 +20,7 @@ services:
       - MYSQL_DATABASE=test_db
       - MYSQL_USER=user1
       - MYSQL_PASSWORD=s123
-    restart: no
+    restart: "no"
     working_dir: /var/www/
     volumes:
       - ../src:/var/www
@@ -33,7 +33,7 @@ services:
 
   postgres-dev:
     image: postgres
-    restart: no
+    restart: "no"
     command: "-c default_text_search_config=pg_catalog.russian"
     environment:
       - TZ=${TZ}
