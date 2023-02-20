@@ -3,14 +3,12 @@ services:
   vscode-devcontainer:
     image: mcr.microsoft.com/devcontainers/typescript-node:18
     command: sleep infinity
-    restart: unless-stopped
+    restart: never
     environment:
       - TZ=${TZ}
-      - DEV_INNER_FRONTEND_DEBUGGER_PORT=${EXTERNAL_NGINX_HTTP_PORT}
-      - DEV_BACKEND_DEBUGGER_PORT=${DEV_BACKEND_DEBUGGER_PORT}
     volumes:
       - type: bind
-        source: ../
+        source: ./
         target: "/workspaces/${COMPOSE_PROJECT_NAME}"
         consistency: delegated
     networks:
