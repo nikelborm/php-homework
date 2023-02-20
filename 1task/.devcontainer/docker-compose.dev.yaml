@@ -1,0 +1,71 @@
+version: '3.9'
+services:
+  nginx-dev:
+    image: nginx:stable-alpine
+    restart: unless-stopped
+    ports:
+      - ${EXTERNAL_NGINX_HTTP_PORT}:80
+    volumes:
+      - ./src:/var/www
+      - ./nginx:/etc/nginx/conf.d
+    depends_on:
+      - php
+    networks:
+      nginx-back-net-dev:
+
+  php:
+    build: ./php
+    environment:
+      - MYSQL_HOST=mysql
+      - MYSQL_DATABASE=test_db
+      - MYSQL_USER=user1
+      - MYSQL_PASSWORD=s123
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./src:/var/www
+    depends_on:
+      - postgres-dev
+    networks:
+      nginx-back-net-dev:
+      back-db-net-dev:
+      vscode-back-net-dev:
+
+  postgres-dev:
+    image: postgres
+    restart: unless-stopped
+    command: "-c default_text_search_config=pg_catalog.russian"
+    environment:
+      - TZ=${TZ}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_USER=${DATABASE_USERNAME}
+      - POSTGRES_DB=${DATABASE_NAME}
+    # In standard dockerfile of postgres there is special instruction that assigns a volume to /var/lib/postgresql/data
+    # I want to get fresh database every time I restart it.
+    tmpfs:
+      - /var/lib/postgresql/data
+    ports:
+      - ${DATABASE_PORT_EXPOSED_TO_DEV_LOCALHOST}:${DATABASE_PORT}
+    networks:
+      back-db-net-dev:
+      vscode-db-net-dev:
+      pgcli-db-net-dev:
+
+  pgcli-dev:
+    image: daxart/pgcli:latest
+    profiles:
+      - use_pgcli
+    command:
+      - postgres://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@postgres-dev/${DATABASE_NAME}
+    networks:
+      pgcli-db-net-dev:
+
+
+networks:
+  nginx-back-net-dev: {}
+  back-db-net-dev: {}
+
+  pgcli-db-net-dev: {}
+
+  vscode-back-net-dev: {}
+  vscode-db-net-dev: {}
